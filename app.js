@@ -4,8 +4,8 @@ const env = require("./config/env");
 const connectDB = require("./config/database");
 const storeRoutes = require("./routes/store.routes");
 const errorMiddleware = require("./middleware/error.middleware");
-
-const app = express();
+const supplierRoutes = require('./routes/supplier.routes');
+app.use('/api/suppliers', supplierRoutes);const app = express();
 
 connectDB();
 
