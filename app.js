@@ -5,6 +5,7 @@ const connectDB = require("./config/database");
 const storeRoutes = require("./routes/store.routes");
 const inventoryRoutes = require("./routes/inventory.routes");
 const supplierRoutes = require("./routes/supplier.routes");
+const productRoutes = require("./routes/product.routes");
 const errorMiddleware = require("./middleware/error.middleware");
 
 const app = express();
@@ -24,7 +25,7 @@ app.post("/test", (req, res) => {
 app.use("/api/stores", storeRoutes);
 app.use("/api/inventory", inventoryRoutes);
 app.use("/api/suppliers", supplierRoutes);
-
+app.use("/api/products", productRoutes);
 app.use(errorMiddleware);
 
 app.listen(env.port, () => {
