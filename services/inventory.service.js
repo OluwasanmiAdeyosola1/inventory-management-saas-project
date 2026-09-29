@@ -1,7 +1,17 @@
 const Inventory = require("../models/Inventory");
+const Product = require("../models/Product");
 
 // Create inventory for a product
 async function createInventory(storeId, productId, quantity = 0) {
+  const product = await Product.findOne({
+    _id: productId,
+    storeId,
+  });
+
+  if (!product) {
+    throw new Error("Product not found in your store");
+  }
+
   return Inventory.create({
     storeId,
     productId,
