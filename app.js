@@ -38,6 +38,10 @@ app.use("/api/sales", saleRoutes);
 
 app.use(errorMiddleware);
 
-app.listen(env.port, () => {
+if (require.main === module) {
+  app.listen(env.port, () => {
     console.log(`Server running on port ${env.port}`);
-});
+  });
+}
+
+module.exports = app;

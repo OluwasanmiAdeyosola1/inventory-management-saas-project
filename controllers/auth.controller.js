@@ -15,6 +15,7 @@ exports.registerOwner = async (req,res) => {
     try{
         const { businessName , email , phone ,address , city , state , country, name , password} = req.body;
         const existing = await User.findOne({email});
+        
         if (existing) {
             return res.status(400).json({success: false , message:"Email has already been used , please try another" , data : null});
         }
@@ -74,6 +75,7 @@ exports.login = async (req,res) => {
             return res.status(401).json({success: false , message : "Invalid email or password inputed ." , data : null});
         }
         const isMatch = await bcrypt.compare(password,user.password);
+        
         if (!isMatch) {
             return res.status(401).json({success:false, message :"Invalid email or password inputed .", data: null});
         }
