@@ -101,3 +101,69 @@ exports.getMe = async (req,res) => {
         res.status(500).json({success:false , message: "Something went wrong" , data : null});
     }
 };
+exports.updateMe = async (req, res) => {
+    try {
+        const { name, email } = req.body;
+
+        if (!name?.trim() || !email?.trim()) {
+            return res.status(400).json({
+                success: false,
+                message: "Name and email are required",
+                data: null,
+            });
+        }
+
+        const normalizedEmail = email.trim().toLowerCase();
+
+        const existingUser = await User.findOne({
+            email: normalizedEmail,
+            _id: { $ne: req.user.userId },
+        });
+
+        if (existingUser) {
+            return res.status(409).json({
+                success: false,
+                message: "Email is already in use",
+                data: null,
+            });
+        }
+
+        const user = await User.findByIdAndUpdate(
+            req.user.userId,
+            {
+                name: name.trim(),
+                email: normalizedEmail,
+            },
+            {
+                new: true,
+                runValidators: true,
+            }
+        );
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found",
+                data: null,
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: "Profile updated successfully",
+            data: {
+                id: user._id,
+                name: user.name,
+                email: user.email,
+                role: user.role,
+                storeId: user.storeId,
+            },
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Unable to update profile",
+            data: null,
+        });
+    }
+};

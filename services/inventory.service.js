@@ -12,10 +12,19 @@ async function createInventory(storeId, productId, quantity = 0) {
     throw new Error("Product not found in your store");
   }
 
+  const existingInventory = await Inventory.findOne({
+    storeId,
+    productId,
+  });
+
+  if (existingInventory) {
+    throw new Error("Inventory already exists for this product");
+  }
+
   return Inventory.create({
     storeId,
     productId,
-    quantity,
+    quantity: Number(quantity),
   });
 }
 
@@ -36,16 +45,29 @@ async function getInventoryByProduct(storeId, productId) {
 
 // Add stock
 async function addStock(storeId, productId, amount) {
-  const inventory = await Inventory.findOne({
+  const product = await Product.findOne({
+    _id: productId,
+    storeId,
+  });
+
+  if (!product) {
+    throw new Error("Product not found in your store");
+  }
+
+  let inventory = await Inventory.findOne({
     storeId,
     productId,
   });
 
   if (!inventory) {
-    throw new Error("Inventory not found");
+    inventory = await Inventory.create({
+      storeId,
+      productId,
+      quantity: 0,
+    });
   }
 
-  inventory.quantity += amount;
+  inventory.quantity += Number(amount);
 
   await inventory.save();
 
@@ -63,11 +85,11 @@ async function removeStock(storeId, productId, amount) {
     throw new Error("Inventory not found");
   }
 
-  if (inventory.quantity < amount) {
+  if (inventory.quantity < Number(amount)) {
     throw new Error("Insufficient stock");
   }
 
-  inventory.quantity -= amount;
+  inventory.quantity -= Number(amount);
 
   await inventory.save();
 
@@ -82,7 +104,7 @@ async function updateStock(storeId, productId, quantity) {
       productId,
     },
     {
-      quantity,
+      quantity: Number(quantity),
     },
     {
       new: true,
